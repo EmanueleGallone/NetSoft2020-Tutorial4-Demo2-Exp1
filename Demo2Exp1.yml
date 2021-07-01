@@ -946,6 +946,8 @@
                   docker exec {{ UPF_container_name }} /bin/sh -c "apt-get update"
                   docker exec {{ UPF_container_name }} /bin/sh -c "apt-get install openssh-server conntrack -y"
                   docker exec {{ UPF_container_name }} /bin/sh -c "echo 'root:root' |chpasswd"                      
+                  docker exec {{ UPF_container_name }} /bin/sh -c "echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config"
+                  docker exec {{ UPF_container_name }} /bin/sh -c "service ssh restart"
           when  : deploy_free5gc == 'true'
 
         - name  : Build certificates - SMF container
