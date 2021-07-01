@@ -413,7 +413,7 @@
 
         - name  : Run free5gc UPF container
           shell :  |
-                docker run -ti -d --device=/dev/net/tun:/dev/net/tun --cap-add=NET_ADMIN --privileged --net {{ docker_custom_network_name }} --ip {{ ip_address_UPF }} --name {{ UPF_container_name }} {{ free5gc_st1_image_name }} bash 
+                docker run -ti -d --device=/dev/net/tun:/dev/net/tun --cap-add=NET_ADMIN --privileged -p 22 --net {{ docker_custom_network_name }} --ip {{ ip_address_UPF }} --name {{ UPF_container_name }} {{ free5gc_st1_image_name }} bash 
           when  : deploy_free5gc == 'true'
 
         - name  : Run free5gc SMF container
@@ -939,6 +939,13 @@
 
                   docker exec {{ UPF_container_name }} /bin/sh -c "chmod u+x {{ path_workspace_free5gc }}/build_certs.sh"
                   docker exec {{ UPF_container_name }} /bin/sh -c "{{ path_workspace_free5gc }}/build_certs.sh"                  
+          when  : deploy_free5gc == 'true'
+
+        - name  : Build openssh server - UPF container
+          shell :  |
+                  docker exec {{ UPF_container_name }} /bin/sh -c "apt-get update"
+                  docker exec {{ UPF_container_name }} /bin/sh -c "apt-get install openssh-server conntrack -y"
+                  docker exec {{ UPF_container_name }} /bin/sh -c "echo 'root:root' |chpasswd"                      
           when  : deploy_free5gc == 'true'
 
         - name  : Build certificates - SMF container
